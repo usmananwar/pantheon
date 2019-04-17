@@ -20,10 +20,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
 public class NetServices implements JsonRpcMethod {
 
@@ -35,16 +33,15 @@ public class NetServices implements JsonRpcMethod {
       final P2PNetwork p2pNetwork,
       final MetricsConfiguration metricsConfiguration) {
 
-    Map<String, ImmutableMap<String, String>> activeServices =
-        new LinkedHashMap<String, ImmutableMap<String, String>>();
+    Builder<String, ImmutableMap<String, String>> servicesMapBuilder = ImmutableMap.builder();
 
     if (jsonRpcConfiguration.isEnabled()) {
-      activeServices.put(
+      servicesMapBuilder.put(
           "jsonrpc",
           createServiceDetailsMap(jsonRpcConfiguration.getHost(), jsonRpcConfiguration.getPort()));
     }
     if (webSocketConfiguration.isEnabled()) {
-      activeServices.put(
+      servicesMapBuilder.put(
           "ws",
           createServiceDetailsMap(
               webSocketConfiguration.getHost(), webSocketConfiguration.getPort()));
@@ -55,19 +52,18 @@ public class NetServices implements JsonRpcMethod {
             .getLocalEnode()
             .ifPresent(
                 enode -> {
-                  activeServices.put(
+                  servicesMapBuilder.put(
                       "p2p", createServiceDetailsMap(enode.getIp(), enode.getListeningPort()));
                 });
       }
     }
     if (metricsConfiguration.isEnabled()) {
-      activeServices.put(
+      servicesMapBuilder.put(
           "metrics",
           createServiceDetailsMap(metricsConfiguration.getHost(), metricsConfiguration.getPort()));
     }
 
-    services =
-        ImmutableMap.<String, ImmutableMap<String, String>>builder().putAll(activeServices).build();
+    services = servicesMapBuilder.build();
   }
 
   @Override
