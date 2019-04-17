@@ -21,7 +21,6 @@ import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 
 public class NetServices implements JsonRpcMethod {
 
@@ -33,7 +32,8 @@ public class NetServices implements JsonRpcMethod {
       final P2PNetwork p2pNetwork,
       final MetricsConfiguration metricsConfiguration) {
 
-    Builder<String, ImmutableMap<String, String>> servicesMapBuilder = ImmutableMap.builder();
+    ImmutableMap.Builder<String, ImmutableMap<String, String>> servicesMapBuilder =
+        ImmutableMap.builder();
 
     if (jsonRpcConfiguration.isEnabled()) {
       servicesMapBuilder.put(
