@@ -99,6 +99,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
@@ -139,7 +140,8 @@ public class JsonRpcMethodsFactory {
       final PrivacyParameters privacyParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
-      final MetricsConfiguration metricsConfiguration) {
+      final MetricsConfiguration metricsConfiguration,
+      final NetworkingConfiguration networkingConfiguration) {
     final BlockchainQueries blockchainQueries =
         new BlockchainQueries(blockchain, worldStateArchive);
     return methods(
@@ -161,7 +163,8 @@ public class JsonRpcMethodsFactory {
         privacyParameters,
         jsonRpcConfiguration,
         webSocketConfiguration,
-        metricsConfiguration);
+        metricsConfiguration,
+        networkingConfiguration);
   }
 
   public Map<String, JsonRpcMethod> methods(
@@ -183,7 +186,8 @@ public class JsonRpcMethodsFactory {
       final PrivacyParameters privacyParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
-      final MetricsConfiguration metricsConfiguration) {
+      final MetricsConfiguration metricsConfiguration,
+      final NetworkingConfiguration networkingConfiguration) {
     final Map<String, JsonRpcMethod> enabledMethods = new HashMap<>();
     if (!rpcApis.isEmpty()) {
       addMethods(enabledMethods, new RpcModules(rpcApis));
@@ -270,7 +274,11 @@ public class JsonRpcMethodsFactory {
           new NetPeerCount(p2pNetwork),
           new NetEnode(p2pNetwork),
           new NetServices(
-              jsonRpcConfiguration, webSocketConfiguration, p2pNetwork, metricsConfiguration));
+              jsonRpcConfiguration,
+              webSocketConfiguration,
+              p2pNetwork,
+              networkingConfiguration,
+              metricsConfiguration));
     }
     if (rpcApis.contains(RpcApis.WEB3)) {
       addMethods(enabledMethods, new Web3ClientVersion(clientVersion), new Web3Sha3());

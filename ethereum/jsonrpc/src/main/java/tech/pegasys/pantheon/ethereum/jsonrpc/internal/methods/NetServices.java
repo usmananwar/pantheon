@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 
 import com.google.common.collect.ImmutableMap;
@@ -30,6 +31,7 @@ public class NetServices implements JsonRpcMethod {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final P2PNetwork p2pNetwork,
+      final NetworkingConfiguration networkingConfiguration,
       final MetricsConfiguration metricsConfiguration) {
 
     ImmutableMap.Builder<String, ImmutableMap<String, String>> servicesMapBuilder =
@@ -47,15 +49,11 @@ public class NetServices implements JsonRpcMethod {
               webSocketConfiguration.getHost(), webSocketConfiguration.getPort()));
     }
     if (p2pNetwork.isP2pEnabled()) {
-      if (p2pNetwork.isP2pEnabled()) {
-        p2pNetwork
-            .getLocalEnode()
-            .ifPresent(
-                enode -> {
-                  servicesMapBuilder.put(
-                      "p2p", createServiceDetailsMap(enode.getIp(), enode.getListeningPort()));
-                });
-      }
+      servicesMapBuilder.put(
+          "p2p",
+          createServiceDetailsMap(
+              networkingConfiguration.getRlpx().getBindHost(),
+              networkingConfiguration.getRlpx().getBindPort()));
     }
     if (metricsConfiguration.isEnabled()) {
       servicesMapBuilder.put(
@@ -73,6 +71,7 @@ public class NetServices implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest req) {
+
     return new JsonRpcSuccessResponse(req.getId(), services);
   }
 

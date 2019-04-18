@@ -36,6 +36,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
@@ -93,6 +94,7 @@ public class JsonRpcTestMethodsFactory {
     final JsonRpcConfiguration jsonRpcConfiguration = mock(JsonRpcConfiguration.class);
     final WebSocketConfiguration webSocketConfiguration = mock(WebSocketConfiguration.class);
     final MetricsConfiguration metricsConfiguration = mock(MetricsConfiguration.class);
+    final NetworkingConfiguration networkingConfiguration = mock(NetworkingConfiguration.class);
 
     return new JsonRpcMethodsFactory()
         .methods(
@@ -114,6 +116,7 @@ public class JsonRpcTestMethodsFactory {
             privacyParameters,
             jsonRpcConfiguration,
             webSocketConfiguration,
-            metricsConfiguration);
+            metricsConfiguration,
+            networkingConfiguration);
   }
 }

@@ -206,7 +206,8 @@ public class JsonRpcHttpServiceRpcApisTest {
                     mock(PrivacyParameters.class),
                     mock(JsonRpcConfiguration.class),
                     mock(WebSocketConfiguration.class),
-                    mock(MetricsConfiguration.class)));
+                    mock(MetricsConfiguration.class),
+                    mock(NetworkingConfiguration.class)));
     final JsonRpcHttpService jsonRpcHttpService =
         new JsonRpcHttpService(
             vertx, folder.newFolder().toPath(), config, new NoOpMetricsSystem(), rpcMethods);
@@ -232,12 +233,8 @@ public class JsonRpcHttpServiceRpcApisTest {
     return config;
   }
 
-  private P2PNetwork createP2pNetwork() {
+  private P2PNetwork createP2pNetwork(final NetworkingConfiguration config) {
     final SECP256K1.KeyPair keyPair = SECP256K1.KeyPair.generate();
-    final NetworkingConfiguration config =
-        NetworkingConfiguration.create()
-            .setRlpx(RlpxConfiguration.create().setBindPort(0))
-            .setDiscovery(DiscoveryConfiguration.create().setBindPort(0));
 
     final NettyP2PNetwork p2pNetwork =
         new NettyP2PNetwork(
@@ -263,6 +260,7 @@ public class JsonRpcHttpServiceRpcApisTest {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final P2PNetwork p2pNetwork,
+      final NetworkingConfiguration networkingConfiguration,
       final MetricsConfiguration metricsConfiguration)
       throws Exception {
     final Set<Capability> supportedCapabilities = new HashSet<>();
@@ -291,7 +289,8 @@ public class JsonRpcHttpServiceRpcApisTest {
                     mock(PrivacyParameters.class),
                     jsonRpcConfiguration,
                     webSocketConfiguration,
-                    metricsConfiguration));
+                    metricsConfiguration,
+                    networkingConfiguration));
     final JsonRpcHttpService jsonRpcHttpService =
         new JsonRpcHttpService(
             vertx,
@@ -377,6 +376,10 @@ public class JsonRpcHttpServiceRpcApisTest {
     JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
     WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
     P2PNetwork p2pNetwork = mock(P2PNetwork.class);
+    final NetworkingConfiguration networkingConfiguration =
+        NetworkingConfiguration.create()
+            .setRlpx(RlpxConfiguration.create().setBindPort(0))
+            .setDiscovery(DiscoveryConfiguration.create().setBindPort(0));
     MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
 
     if (enabledNetServices[netServices.indexOf("jsonrpc")]) {
@@ -387,14 +390,18 @@ public class JsonRpcHttpServiceRpcApisTest {
       webSocketConfiguration = createWebSocketConfiguration();
     }
     if (enabledNetServices[netServices.indexOf("p2p")]) {
-      p2pNetwork = createP2pNetwork();
+      p2pNetwork = createP2pNetwork(networkingConfiguration);
     }
     if (enabledNetServices[netServices.indexOf("metrics")]) {
       metricsConfiguration = createMetricsConfiguration();
     }
 
     return createJsonRpcHttpService(
-        jsonRpcConfiguration, webSocketConfiguration, p2pNetwork, metricsConfiguration);
+        jsonRpcConfiguration,
+        webSocketConfiguration,
+        p2pNetwork,
+        networkingConfiguration,
+        metricsConfiguration);
   }
 
   @Test
@@ -405,6 +412,7 @@ public class JsonRpcHttpServiceRpcApisTest {
             JsonRpcConfiguration.createDefault(),
             WebSocketConfiguration.createDefault(),
             mock(P2PNetwork.class),
+            mock(NetworkingConfiguration.class),
             MetricsConfiguration.createDefault());
     final RequestBody body = createNetServicesRequestBody();
 

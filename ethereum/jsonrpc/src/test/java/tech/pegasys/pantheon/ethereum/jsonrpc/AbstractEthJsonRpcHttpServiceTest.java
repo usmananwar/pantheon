@@ -46,6 +46,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.util.RawBlockIterator;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
@@ -194,7 +195,8 @@ public abstract class AbstractEthJsonRpcHttpServiceTest {
                 privacyParameters,
                 config,
                 mock(WebSocketConfiguration.class),
-                mock(MetricsConfiguration.class));
+                mock(MetricsConfiguration.class),
+                mock(NetworkingConfiguration.class));
 
     config.setPort(0);
     service =
